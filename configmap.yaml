@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prod-config 
+  labels:
+    app.kubernetes.io/name: prod-config
+    tier: config-layer
+data:
+  UI_THEME: "dark"
+  API_URL: "https://api.prod.example.com"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prod-secret
+  labels:
+    app.kubernetes.io/name: prod-config
+    tier: secret-layer
+type: Opaque 
+data:
+  DB_PASSWORD: cHJvZF9wYXNzd29yZA==  # base64 encoded value of "prod_password"
+  API_KEY: cHJvZF9hcGlfa2V5  # base64 encoded value of "prod_api_key"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prod-config-pod 
+  labels:
+    app.kubernetes.io/name: prod-config
+    tier: frontend
+    environment: production
+spec:
+  containers:
+    - name: config-reader
+      image: alpine:latest
+      command: ["/bin/sh", "-c", "echo 'UI Theme: $UI_THEME'; echo 'API URL: $API_URL'; echo 'DB Password: $DB_PASSWORD'; echo 'API Key: $API_KEY'; sleep 3600"]
+      env:
+        - name: UI_THEME
+          valueFrom:
+            configMapKeyRef:
+              name: prod-config
+              key: UI_THEME
+        - name: API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: prod-config
+              key: API_URL
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: prod-secret
+              key: DB_PASSWORD
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: prod-secret
+              key: API_KEY

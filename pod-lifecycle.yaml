@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: lifecycle-test
+spec:
+  restartPolicy: OnFailure
+  containers:
+  - name: nginx
+    image: nginx:alpine
+    lifecycle:
+      postStart:
+        exec:
+          command: ["/bin/sh", "-c", "echo 'PostStart Hook Executed'"]
+      preStop:
+        exec:
+          command: ["/bin/sh", "-c", "echo 'PreStop Hook Executed'"]

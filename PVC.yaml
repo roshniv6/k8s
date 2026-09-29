@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prod-local-pv
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  hostPath:
+    path: /mnt/data/prod-storage
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prod-local-pvc
+spec:
+  accessModes:  
+    - ReadWriteOnce 
+  resources:
+    requests:
+      storage: 500Mi  
+  storageClassName: local-storage
+---
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: prod-data-pod 
+spec: 
+  containers: 
+    - name: data-writer
+      image: alpine:latest
+      command: ["/bin/sh", "-c", "echo 'Hello from prod data!' > data/status.txt; sleep 3600"]
+      volumeMounts: 
+        - mountPath: "/data" 
+          name: prod-storage-volume 
+  volumes: 
+    - name: prod-storage-volume 
+      persistentVolumeClaim: 
+        claimName: prod-local-pvc
+   
+
+    
+

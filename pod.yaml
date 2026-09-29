@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: web3
+  namespace: QA
+  labels: 
+    app: web2
+spec:
+  containers:
+    - name: nginx
+      image: nginx:stable
+      ports:
+        - containerPort: 80
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "128mi"
+        limits: 
+          cpu: "200m"
+          memory: "256Mi"
