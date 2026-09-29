@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: static-web-server
+  labels:
+    app: static-web
+spec:
+  containers: 
+  - name: static-web
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+      name: web
+    
